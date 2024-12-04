@@ -5,27 +5,40 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly prismaService: PrismaService){}
+  constructor(private readonly prismaService: PrismaService) {}
 
   create(createProductDto: CreateProductDto) {
-    this.prismaService.product.create({
-      data: createProductDto
-    })
+    return this.prismaService.product.create({
+      data: createProductDto,
+    });
   }
 
   findAll() {
-    return `This action returns all products`;
+    return this.prismaService.product.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  findOne(id: string) {
+    return this.prismaService.product.findFirst({
+      where: {
+        id,
+      },
+    });
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  update(id: string, updateProductDto: UpdateProductDto) {
+    return this.prismaService.product.update({
+      where: {
+        id,
+      },
+      data: updateProductDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  remove(id: string) {
+    return this.prismaService.product.delete({
+      where: {
+        id,
+      },
+    });
   }
 }
