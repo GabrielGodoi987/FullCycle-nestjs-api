@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ProductSlugAlreadyExistsError } from './errors';
+import { ProductSlugAlreadyExistsError } from '../errors';
 import { NotFoundError } from 'src/common/errors';
 
 @Injectable()
-export class ProductsService {
+export class AdminProductsService {
   private entity = 'product';
   constructor(private readonly prismaService: PrismaService) {}
 
