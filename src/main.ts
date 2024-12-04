@@ -1,10 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ProductSlugAlreadyExistsErrorFilter } from './products/filters/product-slug-already-exists.filter';
+import { HttpStatus, ValidationPipe } from '@nestjs/common';
+import { NotFoundErrorFilter } from './common/filters/not-found-error.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalFilters(new ProductSlugAlreadyExistsErrorFilter());
+  app.useGlobalFilters(new ProductSlugAlreadyExistsErrorFilter(), new NotFoundErrorFilter());
+  app.useGlobalPipes(new ValidationPipe(
+    {
+      errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+    }
+  ));
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

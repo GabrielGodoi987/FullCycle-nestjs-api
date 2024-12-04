@@ -3,9 +3,11 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProductSlugAlreadyExistsError } from './errors';
+import { NotFoundError } from 'src/common/errors';
 
 @Injectable()
 export class ProductsService {
+  private entity = 'product';
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createProductDto: CreateProductDto) {
@@ -28,16 +30,43 @@ export class ProductsService {
     return this.prismaService.product.findMany();
   }
 
-  findOne(id: string) {
-    return this.prismaService.product.findFirst({
+  async findOne(id: string) {
+    const product = await this.prismaService.product.findFirst({
       where: {
         id,
       },
     });
+
+    if (!product) {
+      throw new NotFoundError(this.entity, id);
+    }
+
+    return product;
   }
 
-  update(id: string, updateProductDto: UpdateProductDto) {
-    return this.prismaService.product.update({
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    let product = await this.prismaService.product.findFirst({
+      where: {
+        slug: updateProductDto.slug,
+      },
+    });
+
+    if(product && product.id !== id){
+      throw new ProductSlugAlreadyExistsError(updateProductDto.slug);
+    }
+
+    // esta consulta que garante de fato que o produto realmente existe
+    product = product && product.id === id? product : await this.prismaService.product.findFirst({
+      where: {
+        id
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundError(this.entity, id);
+    }
+
+    return await this.prismaService.product.update({
       where: {
         id,
       },
@@ -45,8 +74,17 @@ export class ProductsService {
     });
   }
 
-  remove(id: string) {
-    return this.prismaService.product.delete({
+  async remove(id: string) {
+    const product = await this.prismaService.product.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundError(this.entity, id);
+    }
+    return await this.prismaService.product.delete({
       where: {
         id,
       },
