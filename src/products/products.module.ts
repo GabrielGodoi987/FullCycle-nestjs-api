@@ -21,7 +21,7 @@ export class ProductsModule implements OnModuleInit {
     for (const producIndex of products) {
       await this.productService.create({
         name: `Product ${producIndex}`,
-        slug: `Product-${producIndex}`,
+        slug: `product-${producIndex}`,
         description: `description of product ${producIndex}`,
         price: producIndex * 100,
       });
