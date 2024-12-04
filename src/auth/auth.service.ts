@@ -3,7 +3,6 @@ import { LoginDto } from './dto/login.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { InvalidCredentialsError } from './errors/erros';
-import { access } from 'fs';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -28,6 +27,8 @@ export class AuthService {
       role: user.role,
     };
 
-    return this.jwtService.sign(payload);
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }
